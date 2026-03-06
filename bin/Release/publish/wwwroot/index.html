@@ -1,0 +1,1317 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Управление клиентами</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+
+        body {
+            background: linear-gradient(135deg, #e9d5ff 0%, #d8b4fe 50%, #c084fc 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+        }
+
+        /* Добавляем размытый слой поверх градиента */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: inherit;
+            filter: blur(20px);
+            z-index: -1;
+            transform: scale(1.1);
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Auth Card Styles */
+        .auth-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 80vh;
+        }
+
+        .auth-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 50px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .auth-header h1 {
+            font-size: 32px;
+            color: #6b21a5;
+            margin-bottom: 8px;
+        }
+
+        .auth-header p {
+            color: #7e5a9c;
+            font-size: 16px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: #7e5a9c;
+            font-weight: 500;
+            font-size: 14px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 16px 18px;
+            border: 2px solid #e9d5ff;
+            border-radius: 16px;
+            font-size: 16px;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: #a855f7;
+            box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.2);
+            background: white;
+        }
+
+        .btn {
+            width: 100%;
+            padding: 16px;
+            border: none;
+            border-radius: 16px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);
+            color: white;
+            margin-top: 10px;
+            box-shadow: 0 4px 15px rgba(168, 85, 247, 0.3);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(168, 85, 247, 0.5);
+        }
+
+        .btn:active {
+            transform: translateY(0);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #fecaca 0%, #fca5a5 100%);
+            color: #be185d;
+            box-shadow: 0 4px 15px rgba(245, 101, 101, 0.3);
+        }
+
+        .btn-outline {
+            background: rgba(255, 255, 255, 0.8);
+            border: 2px solid #a855f7;
+            color: #a855f7;
+            padding: 8px 16px;
+            width: auto;
+            border-radius: 50px;
+            backdrop-filter: blur(5px);
+        }
+
+        .btn-outline:hover {
+            background: #a855f7;
+            color: white;
+        }
+
+        .btn-small {
+            width: auto;
+            padding: 8px 16px;
+            font-size: 14px;
+            margin: 0;
+            border-radius: 50px;
+        }
+
+        .btn-icon {
+            width: auto;
+            padding: 12px 20px;
+            border-radius: 50px;
+            margin: 0;
+        }
+
+        .btn-clear {
+            background: linear-gradient(135deg, #c4b5fd 0%, #a78bfa 100%);
+            color: white;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(167, 139, 250, 0.3);
+        }
+
+        .auth-switch {
+            text-align: center;
+            margin-top: 25px;
+            color: #7e5a9c;
+            font-size: 14px;
+        }
+
+        .auth-switch a {
+            color: #a855f7;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: color 0.3s;
+        }
+
+        .auth-switch a:hover {
+            color: #7e22ce;
+            text-decoration: underline;
+        }
+
+        /* Main Section Styles */
+        .main-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 30px;
+            padding: 30px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            width: 100%;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 20px;
+            width: 100%;
+        }
+
+        .header h2 {
+            font-size: 36px;
+            color: #6b21a5;
+            margin: 0;
+            text-align: center;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-info-card {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            padding: 15px 25px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .user-details {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .user-name {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 8px 16px;
+            border-radius: 50px;
+            border: 1px solid #e9d5ff;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .user-name span {
+            color: #6b21a5;
+            font-weight: 600;
+        }
+
+        .user-email {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            padding: 8px 16px;
+            border-radius: 50px;
+            border: 1px solid #e9d5ff;
+            color: #6b21a5;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .logout-btn {
+            background: white;
+            border: 2px solid #a855f7;
+            padding: 8px 25px;
+            border-radius: 50px;
+            color: #a855f7;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .logout-btn:hover {
+            background: #a855f7;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(168, 85, 247, 0.4);
+        }
+
+        .controls {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-bottom: 30px;
+            width: 100%;
+        }
+
+        .add-section {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 20px;
+            padding: 20px;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .add-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .add-section-header h3 {
+            color: #6b21a5;
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        /* Сноска для обязательных полей */
+        .required-note {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+            color: #a855f7;
+            background: rgba(168, 85, 247, 0.1);
+            padding: 5px 12px;
+            border-radius: 50px;
+            margin-left: 10px;
+        }
+
+        .required-note span {
+            font-weight: 600;
+            color: #7e22ce;
+        }
+
+        .required-star {
+            color: #e53e3e;
+            font-weight: 600;
+            margin-left: 2px;
+        }
+
+        .add-form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            width: 100%;
+            margin-top: 10px;
+            position: relative;
+        }
+
+        .add-form input {
+            flex: 1;
+            min-width: 250px;
+            padding: 12px 14px;
+            border: 2px solid #e9d5ff;
+            border-radius: 50px;
+            font-size: 15px;
+            transition: all 0.3s;
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .add-form input.required-field {
+            border-left: 4px solid #a855f7;
+        }
+
+        .add-form input:focus {
+            outline: none;
+            border-color: #a855f7;
+            box-shadow: 0 0 0 4px rgba(168, 85, 247, 0.2);
+            background: white;
+        }
+
+        .add-form input::placeholder {
+            color: #aaa;
+            font-size: 14px;
+        }
+
+        .field-hint {
+            font-size: 12px;
+            color: #7e5a9c;
+            margin-top: 4px;
+            margin-left: 15px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .field-hint i {
+            font-style: normal;
+            color: #a855f7;
+            font-weight: 600;
+        }
+
+        .add-form-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            width: 100%;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .table-header-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .customer-count {
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            border-radius: 50px;
+            padding: 8px 25px;
+            color: #6b21a5;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .customer-count span {
+            background: #a855f7;
+            color: white;
+            padding: 2px 12px;
+            border-radius: 50px;
+            font-size: 14px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Подсказка об обязательных полях */
+        .global-hint {
+            background: rgba(168, 85, 247, 0.1);
+            border: 1px solid rgba(168, 85, 247, 0.3);
+            border-radius: 50px;
+            padding: 6px 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 13px;
+            color: #6b21a5;
+            backdrop-filter: blur(5px);
+        }
+
+        .global-hint .star {
+            color: #e53e3e;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .global-hint .text {
+            font-weight: 500;
+        }
+
+        /* Table Styles */
+        .table-container {
+            overflow-x: auto;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            width: 100%;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 800px;
+        }
+
+        th {
+            background: linear-gradient(135deg, #a855f7 0%, #7e22ce 100%);
+            color: white;
+            font-weight: 600;
+            padding: 16px;
+            text-align: center;
+            font-size: 14px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+
+        th:first-child {
+            border-top-left-radius: 20px;
+        }
+
+        th:last-child {
+            border-top-right-radius: 20px;
+        }
+
+        td {
+            padding: 16px;
+            border-bottom: 1px solid rgba(233, 213, 255, 0.5);
+            color: #4a044e;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        tr:last-child td {
+            border-bottom: none;
+        }
+
+        tr:hover td {
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .table-actions {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+        }
+
+        .emoji-button {
+            font-size: 20px;
+            background: rgba(255, 255, 255, 0.8);
+            border: 1px solid #e9d5ff;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 50px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            backdrop-filter: blur(5px);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+        }
+
+        .emoji-button:hover {
+            transform: scale(1.1);
+            background: white;
+            box-shadow: 0 5px 15px rgba(168, 85, 247, 0.3);
+        }
+
+        .emoji-button.edit:hover {
+            background: rgba(72, 187, 120, 0.1);
+            border-color: #48bb78;
+        }
+
+        .emoji-button.delete:hover {
+            background: rgba(245, 101, 101, 0.1);
+            border-color: #f56565;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 40px;
+            border-radius: 30px;
+            width: 100%;
+            max-width: 450px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            animation: slideIn 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateY(-30px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .modal-content h2 {
+            margin-bottom: 25px;
+            color: #6b21a5;
+            font-size: 24px;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 25px;
+        }
+
+        .modal-actions .btn {
+            margin: 0;
+            border-radius: 50px;
+        }
+
+        /* Confirm Dialog Styles */
+        .confirm-dialog {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 30px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            z-index: 2000;
+            max-width: 400px;
+            width: 90%;
+            animation: slideIn 0.3s ease;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        .confirm-dialog h3 {
+            color: #6b21a5;
+            margin-bottom: 15px;
+            font-size: 20px;
+        }
+
+        .confirm-dialog p {
+            color: #7e5a9c;
+            margin-bottom: 25px;
+            font-size: 16px;
+        }
+
+        .confirm-dialog .buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .confirm-dialog .btn {
+            width: auto;
+            padding: 10px 25px;
+            margin: 0;
+            border-radius: 50px;
+        }
+
+        .confirm-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(5px);
+            z-index: 1999;
+            display: none;
+        }
+
+        /* Message Styles */
+        .message {
+            padding: 16px 20px;
+            border-radius: 50px;
+            margin-bottom: 25px;
+            animation: slideDown 0.3s ease;
+            font-weight: 500;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        @keyframes slideDown {
+            from {
+                transform: translateY(-20px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+
+        .message.success {
+            background: rgba(198, 246, 213, 0.9);
+            color: #22543d;
+            border-left: 4px solid #48bb78;
+        }
+
+        .message.error {
+            background: rgba(254, 215, 215, 0.9);
+            color: #742a2a;
+            border-left: 4px solid #f56565;
+        }
+
+        .message.info {
+            background: rgba(233, 213, 255, 0.9);
+            color: #6b21a5;
+            border-left: 4px solid #a855f7;
+        }
+
+        /* Loading Spinner */
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #a855f7;
+        }
+
+        .loading::after {
+            content: '';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-left: 10px;
+            border: 3px solid #a855f7;
+            border-top-color: transparent;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .container {
+                max-width: 100%;
+                padding: 10px;
+            }
+
+            .auth-card {
+                padding: 30px 20px;
+                max-width: 100%;
+            }
+
+            .user-info-card {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .user-details {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .add-form {
+                flex-direction: column;
+            }
+
+            .add-form-buttons {
+                flex-direction: column;
+            }
+
+            .table-header {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .header h2 {
+                font-size: 28px;
+            }
+
+            .table-header-left {
+                width: 100%;
+                justify-content: space-between;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="auth-container" id="authSection">
+            <div class="auth-card" id="authCard">
+                <div class="auth-header">
+                    <h1 id="authTitle">Добро пожаловать!</h1>
+                    <p id="authSubtitle">Войдите в свой аккаунт</p>
+                </div>
+
+                <!--Форма входа-->
+                <div id="loginForm">
+                    <div class="form-group">
+                        <label>📧 Email</label>
+                        <input type="email" id="loginEmail" placeholder="your@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>🔒 Пароль</label>
+                        <input type="password" id="loginPassword" placeholder="••••••••">
+                    </div>
+                    <button class="btn" onclick="login()">
+                        🔐 Войти
+                    </button>
+                    <div class="auth-switch">
+                        Нет аккаунта? <a onclick="switchToRegister()">Зарегистрироваться</a>
+                    </div>
+                </div>
+
+                <!-- Форма регистрации -->
+                <div id="registerForm" style="display: none;">
+                    <div class="form-group">
+                        <label>👤 Имя</label>
+                        <input type="text" id="regName" placeholder="Иван Иванов">
+                    </div>
+                    <div class="form-group">
+                        <label>📧 Email</label>
+                        <input type="email" id="regEmail" placeholder="your@email.com">
+                    </div>
+                    <div class="form-group">
+                        <label>🔒 Пароль</label>
+                        <input type="password" id="regPassword" placeholder="••••••••">
+                    </div>
+                    <div class="form-group">
+                        <label>📍 Адрес</label>
+                        <input type="text" id="regAddress" placeholder="Ваш адрес">
+                    </div>
+                    <button class="btn" onclick="register()">
+                        📝 Зарегистрироваться
+                    </button>
+                    <div class="auth-switch">
+                        Уже есть аккаунт? <a onclick="switchToLogin()">Войти</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Главное окно -->
+        <div class="main-card" id="mainSection" style="display: none;">
+            <div class="header">
+                <h2>👥 Управление клиентами</h2>
+            </div>
+
+            <!-- Информация пользователя -->
+            <div class="user-info-card" id="userInfoCard">
+                <div class="user-details">
+                    <div class="user-name">
+                        <span>👋</span>
+                        <span id="userName"></span>
+                    </div>
+                    <div class="user-email">
+                        <span>📧</span>
+                        <span id="userEmail"></span>
+                    </div>
+                </div>
+                <button class="logout-btn" onclick="logout()">
+                    🚪 Выйти
+                </button>
+            </div>
+
+            <!-- Добавление клиента -->
+            <div class="controls">
+                <div class="add-section">
+                    <div class="add-section-header">
+                        <h3>➕ Добавление нового клиента</h3>
+
+                    </div>
+                    <div class="add-form">
+                        <input type="text" id="inlineName" placeholder="Имя *" class="required-field">
+                        <input type="email" id="inlineEmail" placeholder="Email *" class="required-field">
+                        <input type="text" id="inlineAddress" placeholder="Адрес (необязательно)">
+                        <div class="add-form-buttons">
+                            <button class="btn-small btn-icon" style="background:linear-gradient(135deg,#a855f7,#7e22ce);color:#fff;" onclick="inlineAddCustomer()">
+                                ➕ Добавить
+                            </button>
+                            <button class="btn-small btn-icon btn-clear" onclick="clearAddForm()">
+                                🧹 Очистить
+                            </button>
+                        </div>
+                    </div>
+                    <!-- Дополнительная подсказка под полями -->
+                    <div class="field-hint">
+                        <span>💡</span>
+                        <span>Поля отмеченные <i class="required-star">*</i> обязательны для заполнения</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="message" id="message"></div>
+
+            <!-- Таблица клиентов -->
+            <div class="table-header">
+                <div class="table-header-left">
+                    <h3 style="color:#6b21a5;">📋 Список клиентов</h3>
+                </div>
+                <div class="customer-count" id="customerCount">
+                    📊 Всего клиентов: <span id="countValue">0</span>
+                </div>
+            </div>
+
+            <div class="table-container">
+                <table id="customersTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Имя</th>
+                            <th>Email</th>
+                            <th>Адрес</th>
+                            <th>Действия</th>
+                        </tr>
+                    </thead>
+                    <tbody id="customersTableBody">
+                        <tr>
+                            <td colspan="5" class="loading">Загрузка...</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Добавление/редактирование -->
+    <div class="modal" id="customerModal">
+        <div class="modal-content">
+            <h2 id="modalTitle">➕ Добавить клиента</h2>
+            <div class="form-group">
+                <label>👤 Имя </label>
+                <input type="text" id="modalName" placeholder="Введите имя">
+            </div>
+            <div class="form-group">
+                <label>📧 Email </label>
+                <input type="email" id="modalEmail" placeholder="email@example.com">
+            </div>
+            <div class="form-group">
+                <label>📍 Адрес</label>
+                <input type="text" id="modalAddress" placeholder="Введите адрес">
+            </div>
+            <div class="field-hint" style="margin-bottom: 15px;">
+                <span>💡</span>
+                <span>Поля отмеченные <span class="required-star">*</span> обязательны</span>
+            </div>
+            <div class="modal-actions">
+                <button class="btn" onclick="saveCustomer()">
+                    💾 Сохранить
+                </button>
+                <button class="btn btn-danger" onclick="closeModal()">
+                    ❌ Отмена
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Удаление -->
+    <div class="confirm-overlay" id="confirmOverlay" style="display: none;" onclick="closeConfirmDialog()"></div>
+    <div class="confirm-dialog" id="confirmDialog" style="display: none;">
+        <h3>🗑️ Подтверждение удаления</h3>
+        <p id="confirmMessage">Вы уверены, что хотите удалить этого клиента?</p>
+        <div class="buttons">
+            <button class="btn btn-danger" id="confirmDeleteBtn">Да, удалить</button>
+            <button class="btn btn-outline" onclick="closeConfirmDialog()">Отмена</button>
+        </div>
+    </div>
+
+    <script>
+        let token = localStorage.getItem('token');
+        let currentUser = JSON.parse(localStorage.getItem('user') || '{}');
+        let editId = null;
+        let deleteId = null;
+
+        const API_URL = window.location.origin;
+        if (token) {
+            showMainSection();
+            loadCustomers();
+        }
+        function switchToRegister() {
+            document.getElementById('loginForm').style.display = 'none';
+            document.getElementById('registerForm').style.display = 'block';
+            document.getElementById('authTitle').textContent = 'Создать аккаунт';
+            document.getElementById('authSubtitle').textContent = 'Зарегистрируйтесь для доступа';
+        }
+
+        function switchToLogin() {
+            document.getElementById('loginForm').style.display = 'block';
+            document.getElementById('registerForm').style.display = 'none';
+            document.getElementById('authTitle').textContent = 'Добро пожаловать!';
+            document.getElementById('authSubtitle').textContent = 'Войдите в свой аккаунт';
+        }
+
+        // функция авторизации
+        async function register() {
+            const data = {
+                name: document.getElementById('regName').value,
+                email: document.getElementById('regEmail').value,
+                password: document.getElementById('regPassword').value,
+                address: document.getElementById('regAddress').value
+            };
+
+            if (!data.name || !data.email || !data.password) {
+                showAuthMessage('Пожалуйста, заполните все обязательные поля', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/api/auth/register`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    showAuthMessage('✅ Регистрация успешна! Теперь вы можете войти.', 'success');
+                    clearRegisterForm();
+                    switchToLogin();
+                } else {
+                    showAuthMessage(result.message || '❌ Ошибка регистрации', 'error');
+                }
+            } catch (error) {
+                showAuthMessage('❌ Ошибка соединения', 'error');
+            }
+        }
+
+        async function login() {
+            const data = {
+                email: document.getElementById('loginEmail').value,
+                password: document.getElementById('loginPassword').value
+            };
+
+            if (!data.email || !data.password) {
+                showAuthMessage('Введите email и пароль', 'error');
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/api/auth/login`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    token = result.token;
+                    currentUser = result;
+                    localStorage.setItem('token', token);
+                    localStorage.setItem('user', JSON.stringify(currentUser));
+                    showMainSection();
+                    loadCustomers();
+                    window.location.href = '/index.html';
+                } else {
+                    showAuthMessage(result.message || '❌ Неверный email или пароль', 'error');
+                }
+            } catch (error) {
+                showAuthMessage('❌ Ошибка соединения', 'error');
+            }
+        }
+
+        function logout() {
+            token = null;
+            currentUser = {};
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            document.getElementById('authSection').style.display = 'flex';
+            document.getElementById('mainSection').style.display = 'none';
+            switchToLogin();
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+        }
+
+        // функции клиента
+        async function loadCustomers() {
+            try {
+                const response = await fetch(`${API_URL}/api/customer`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                if (response.status === 401) {
+                    logout();
+                    showMessage('⏰ Сессия истекла. Войдите снова.', 'error');
+                    return;
+                }
+
+                const customers = await response.json();
+                displayCustomers(customers);
+                updateCustomerCount(customers.length);
+            } catch (error) {
+                showMessage('❌ Ошибка загрузки данных', 'error');
+            }
+        }
+
+        function updateCustomerCount(count) {
+            document.getElementById('countValue').textContent = count;
+        }
+
+        function displayCustomers(customers) {
+            const tbody = document.getElementById('customersTableBody');
+            
+            if (customers.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; padding: 40px;">📭 Клиенты не найдены</td></tr>';
+                return;
+            }
+
+            tbody.innerHTML = customers.map(c => `
+                <tr>
+                    <td><strong>#${c.id}</strong></td>
+                    <td>${c.name || '—'}</td>
+                    <td>${c.email || '—'}</td>
+                    <td>${c.address || '—'}</td>
+                    <td class="table-actions">
+                        <button class="emoji-button edit" onclick="editCustomer(${c.id})" title="Редактировать">
+                            ✏️
+                        </button>
+                        <button class="emoji-button delete" onclick="showDeleteConfirm(${c.id})" title="Удалить">
+                            🗑️
+                        </button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        function clearAddForm() {
+            document.getElementById('inlineName').value = '';
+            document.getElementById('inlineEmail').value = '';
+            document.getElementById('inlineAddress').value = '';
+            showMessage('🧹 Форма очищена', 'success');
+        }
+
+        function showAddModal() {
+            editId = null;
+            document.getElementById('modalTitle').innerHTML = '➕ Добавить клиента';
+            document.getElementById('modalName').value = '';
+            document.getElementById('modalEmail').value = '';
+            document.getElementById('modalAddress').value = '';
+            document.getElementById('customerModal').style.display = 'flex';
+        }
+
+        async function editCustomer(id) {
+            try {
+                const response = await fetch(`${API_URL}/api/customer/${id}`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const customer = await response.json();
+
+                editId = id;
+                document.getElementById('modalTitle').innerHTML = '✏️ Редактировать клиента';
+                document.getElementById('modalName').value = customer.name || '';
+                document.getElementById('modalEmail').value = customer.email || '';
+                document.getElementById('modalAddress').value = customer.address || '';
+                document.getElementById('customerModal').style.display = 'flex';
+            } catch (error) {
+                showMessage('❌ Ошибка загрузки данных клиента', 'error');
+            }
+        }
+
+        async function saveCustomer() {
+            const data = {
+                name: document.getElementById('modalName').value,
+                email: document.getElementById('modalEmail').value,
+                address: document.getElementById('modalAddress').value
+            };
+
+            if (!data.name || !data.email) {
+                showMessage('❌ Имя и Email обязательны для заполнения', 'error');
+                return;
+            }
+
+            try {
+                let response;
+                if (editId) {
+                    response = await fetch(`${API_URL}/api/customer/${editId}`, {
+                        method: 'PUT',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(data)
+                    });
+                } else {
+                    response = await fetch(`${API_URL}/api/customer`, {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${token}`
+                        },
+                        body: JSON.stringify(data)
+                    });
+                }
+
+                if (response.ok) {
+                    closeModal();
+                    loadCustomers();
+                    clearAddForm();
+                    showMessage(editId ? '✅ Клиент обновлен' : '✅ Клиент добавлен', 'success');
+                } else {
+                    const result = await response.json();
+                    showMessage(result.message || '❌ Ошибка сохранения', 'error');
+                }
+            } catch (error) {
+                showMessage('❌ Ошибка сохранения', 'error');
+            }
+        }
+
+        function inlineAddCustomer() {
+            const name = document.getElementById('inlineName').value.trim();
+            const email = document.getElementById('inlineEmail').value.trim();
+            const address = document.getElementById('inlineAddress').value.trim();
+
+            document.getElementById('modalName').value = name;
+            document.getElementById('modalEmail').value = email;
+            document.getElementById('modalAddress').value = address;
+
+            if (!name || !email) {
+                showMessage('❌ Имя и Email обязательны', 'error');
+                return;
+            }
+
+            editId = null;
+            saveCustomer();
+        }
+        function showDeleteConfirm(id) {
+            deleteId = id;
+            document.getElementById('confirmOverlay').style.display = 'block';
+            document.getElementById('confirmDialog').style.display = 'block';
+        }
+
+        function closeConfirmDialog() {
+            document.getElementById('confirmOverlay').style.display = 'none';
+            document.getElementById('confirmDialog').style.display = 'none';
+            deleteId = null;
+        }
+        document.getElementById('confirmDeleteBtn').onclick = async function() {
+            if (deleteId) {
+                try {
+                    const response = await fetch(`${API_URL}/api/customer/${deleteId}`, {
+                        method: 'DELETE',
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+
+                    if (response.ok) {
+                        loadCustomers();
+                        showMessage('✅ Клиент удален', 'success');
+                    } else {
+                        showMessage('❌ Ошибка удаления', 'error');
+                    }
+                } catch (error) {
+                    showMessage('❌ Ошибка удаления', 'error');
+                }
+                closeConfirmDialog();
+            }
+        };
+
+        function closeModal() {
+            document.getElementById('customerModal').style.display = 'none';
+        }
+
+        function showMainSection() {
+            document.getElementById('authSection').style.display = 'none';
+            document.getElementById('mainSection').style.display = 'block';
+            document.getElementById('userName').textContent = currentUser.name || '';
+            document.getElementById('userEmail').textContent = currentUser.email || '';
+        }
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+            messageDiv.style.display = 'block';
+            
+            setTimeout(() => {
+                messageDiv.style.display = 'none';
+            }, 3000);
+        }
+
+        function showAuthMessage(text, type) {
+            const authCard = document.getElementById('authCard');
+            const existingMessage = document.querySelector('.auth-message');
+            
+            if (existingMessage) {
+                existingMessage.remove();
+            }
+
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type} auth-message`;
+            messageDiv.textContent = text;
+            
+            authCard.insertBefore(messageDiv, authCard.firstChild);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 3000);
+        }
+
+        function clearRegisterForm() {
+            document.getElementById('regName').value = '';
+            document.getElementById('regEmail').value = '';
+            document.getElementById('regPassword').value = '';
+            document.getElementById('regAddress').value = '';
+        }
+        window.onclick = function(event) {
+            const modal = document.getElementById('customerModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    </script>
+</body>
+</html>
